@@ -65,6 +65,3 @@
 - Exclude Tier 4 (missing genomic subtype)
 - **Validation (Panel E):** scRNA subset (N=52)
 
----
-
-This README provides a structured summary of genomic data tiers, subtyping hierarchy, and figure-specific analysis assignments for the paper.
