@@ -1,9 +1,14 @@
+# B-ALL Multi-Omics Project
 
-## This README describes data availability and its contribution to figures.
+## Overview
+This README documents data availability, analysis strategies, and codes used for figure generation in the study of B-ALL (acute lymphoblastic leukemia).  
+The project integrates **genomic data**, **single-cell RNA sequencing (scRNA)**, and **VDJ repertoire analysis** to provide a comprehensive view of disease biology.
 
+---
 
-## Genomic Data Summary
-## Tier Overview
+## Part 1: Genomic Data
+
+### Tier Overview
 | Tier | Definition     | Count | Relapse Cases | Strategy for Paper |
 |------|----------------|-------|---------------|--------------------|
 | 1    | Panel + WES    | 29    | 4             | Validation Set. Use Panel for SNVs, WES for CNVs. |
@@ -12,58 +17,75 @@
 | 4    | No DNA         | 9     | 1             | Exclude from Figs 1 & 7. |
 | **Total** |         | **105** | **11**        |                    |
 
----
-
-## Subtyping Hierarchy Strategy
+### Subtyping Hierarchy Strategy
 - **Tier 1 (Panel + WES): Gold Standard**
   - Panel: fusions (ETV6-RUNX1, TCF3-PBX1, BCR-ABL1)
   - WES: ploidy changes (High Hyperdiploidy, Hypodiploidy), IKZF1 deletions
   - Confidence: High
-
-- **Tier 2 (WES Only): Rescue Set (Critical for Relapse)**
-  - WES for all drivers
-  - Challenge: fusions harder to detect; check SVs in ETV6, KMT2A, TCF3
-  - If fusion missed, check CNVs (High Hyperdiploidy)
+- **Tier 2 (WES Only): Rescue Set**
+  - WES for all drivers; focus on relapse cases
   - Confidence: Medium-High
-
 - **Tier 3 (Panel Only): Clinical Standard**
   - Panel for fusions and SNVs (PAX5)
-  - Limitation: may miss High Hyperdiploidy and Ph-like drivers
-  - Action: classify by available drivers; if none, label "B-other"
+  - Limitations: may miss High Hyperdiploidy and Ph-like drivers
   - Confidence: Medium
-
 - **Tier 4 (No DNA)**
-  - Do not subtype
-  - Label as "Unknown" in Table 1
+  - Do not subtype; label as "Unknown"
+
+### Analysis Assignment Matrix (Per Figure)
+- **Figure 1:** Genomic Landscape (Tiers 1–3)
+- **Figure 2:** Clonal Evolution (Tiers 1–2 only)
+- **Figure 3–4:** scRNA Atlas & Immune TME (all scRNA samples including Tier 4)
+- **Figure 5:** Pharmacogenomics (Tiers 1–3)
+- **Figure 6:** Multi-Omics Integration (intersection of DNA + scRNA/VDJ)
+- **Figure 7:** Predictive Model (Tiers 1–3, validation with scRNA subset)
 
 ---
 
-## Analysis Assignment Matrix (Per Figure)
+## Part 2: Single-Cell RNA (scRNA) Data
 
-### Figure 1: Genomic Landscape
-- **Oncoplot (Panel B):** Tiers 1 + 2 + 3 (add Data Source track)
-- **CNV Landscape (Panel C):** Tiers 1 + 2 (WES), Tier 3 (targeted CNVs only)
-- **Volcano Plots (Panel D/E):** Tiers 1 + 2 + 3 (maximize statistical power)
+### Data Availability
+- 52 scRNA samples across Tiers 1, 2, 3, and 4.
 
-### Figure 2: Clonal Evolution (Deep Genomics)
-- **Clonal Architecture (Panel A):** Tiers 1 + 2 (WES required)
-- **Evolutionary Trees (Panel B):** Select 2 patients from Tier 1 or 2
-- **Mutational Signatures (Panel C):** Tiers 1 + 2 (COSMIC signatures need WES)
+### Contributions
+- Immune microenvironment characterization (Figures 3 & 4).
+- Validation subset for predictive modeling (Figure 7).
+- Integration with genomic drivers (Figure 6).
 
-### Figures 3 & 4: Single-Cell Atlas & Immune TME
-- Use all scRNA samples (N=52) across Tiers 1, 3, and 4
-- Tier 4 contributes via scRNA (T-cells, B-blasts)
+### Analysis Highlights
+- Cell type annotation (T-cells, B-blasts, myeloid subsets).
+- Differential expression and pathway enrichment.
+- Immune TME profiling.
 
-### Figure 5: Pharmacogenomics
-- **Germline Heatmap (Panel B):** Tiers 1 + 2 + 3
-- If Tier 3 lacks NUDT15/TPMT, use Tiers 1 + 2 only
+---
 
-### Figure 6: Multi-Omics Integration
-- **Driver vs. Phenotype (Panel A/B):** Intersection of (Tiers 1+2+3) AND (scRNA samples)
-- **Genomic-Clonal Correlation (Panel C):** Intersection of (Tiers 1+2+3) AND (VDJ samples)
+## Part 3: VDJ Repertoire Data
 
-### Figure 7: Predictive Model
-- **Nomogram/LASSO:** Tiers 1 + 2 + 3 (N=96)
-- Exclude Tier 4 (missing genomic subtype)
-- **Validation (Panel E):** scRNA subset (N=52)
+### Data Availability
+- Subset of patients with VDJ sequencing.
+
+### Contributions
+- Clonal correlation with genomic drivers (Figure 6C).
+- Immune repertoire diversity analysis.
+
+### Analysis Highlights
+- Clonal expansion patterns.
+- Correlation with relapse and treatment response.
+
+---
+
+## Codes and Pipelines
+All scripts for preprocessing, analysis, and figure generation are introduced in this README.  
+- **Genomic analysis:** Panel/WES harmonization, CNV calling, driver classification.  
+- **scRNA analysis:** Cell clustering, annotation, immune TME profiling.  
+- **VDJ analysis:** Clonal assignment, diversity metrics, integration with scRNA.  
+
+---
+
+## Figures Overview
+- **Figure 1–2:** Genomic landscape & clonal evolution.  
+- **Figure 3–4:** Single-cell atlas & immune TME.  
+- **Figure 5:** Pharmacogenomics.  
+- **Figure 6:** Multi-omics integration (Genomic + scRNA + VDJ).  
+- **Figure 7:** Predictive modeling.  
 
