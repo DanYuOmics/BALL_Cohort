@@ -13,9 +13,9 @@ The project integrates **genomic data (Panel/WES)**, **single-cell RNA sequencin
 |------|------------------|-----|-------|-------|---------|------|-------|
 | 1    | Panel + WES      | 29  | 29    | 29    | 4       | 0    | Validation Set. Use Panel for SNVs, WES for CNVs. |
 | 2    | WES Only         | 4   | 0     | 4     | 4       | 0    | Rescue Set. Focus on relapse cases. |
-| 3    | Panel Only       | 0   | 71    | 71    | 2       | 2    | Clinical Standard. Use Panel for fusions and SNVs. |
-| 4    | No DNA           | 0   | 0     | 9     | 1       | 0    | Excluded from genomic figures. |
-| **Total** |              | 33  | 100   | 113   | 11      | 2    | Matches dataset |
+| 3    | Panel Only       | 0   | 70    | 70    | 2       | 2    | Clinical Standard. Use Panel for fusions and SNVs. |
+| 4    | No DNA           | 0   | 0     | 2     | 1       | 0    | Excluded from genomic figures. |
+| **Total** |              | 33  | 99    | 105   | 11      | 2    | Matches patient dataset |
 
 - **Relapse patients**: 11 total (Tier 1 = 4, Tier 2 = 4, Tier 3 = 2, Tier 4 = 1).  
 - **Deaths**: 2 patients (both in Tier 3).  
@@ -64,4 +64,5 @@ The project integrates **genomic data (Panel/WES)**, **single-cell RNA sequencin
 - **Figure 5**: Pharmacogenomics.  
 - **Figure 6**: Multi-omics integration (Genomic + scRNA + VDJ).  
 - **Figure 7**: Predictive modeling.  
+
 
