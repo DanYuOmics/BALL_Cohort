@@ -1,7 +1,3 @@
-好的，我帮你整理一个最终版的 **README**，只保留 **Genomic Data 表格**，并更新了 WES、Panel、scRNA、VDJ、Relapse、Died 的情况。
-
----
-
 # B-ALL Multi-Omics Project
 
 ## Overview
