@@ -10,7 +10,7 @@ library(readxl)
 # ==============================================================================
 # 1. Environment Setup and Mutation Matrix Ingestion via maftools
 # ==============================================================================
-setwd("/Users/Elizabeth/Library/Mobile Documents/com~apple~CloudDocs/MyDocs/22_HKU/project_BALL/")
+setwd("/Users/DanYu_PhD_BVSc/Library/Mobile Documents/com~apple~CloudDocs/MyDocs/22_HKU/project_BALL/")
 
 # Locate ANNOVAR clean somatic callsets for the targeted panel cohort
 maf_list <- list.files("/Volumes/Extreme SSD/somatic_annovar_output/panel1",
