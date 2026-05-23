@@ -1,0 +1,145 @@
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(stringr)
+library(data.table)
+library(maftools)
+library(GenomicRanges)
+library(readxl)
+
+# ==============================================================================
+# 1. Environment Setup and Mutation Matrix Ingestion via maftools
+# ==============================================================================
+setwd("/Users/Elizabeth/Library/Mobile Documents/com~apple~CloudDocs/MyDocs/22_HKU/project_BALL/")
+
+# Locate ANNOVAR clean somatic callsets for the targeted panel cohort
+maf_list <- list.files("/Volumes/Extreme SSD/somatic_annovar_output/panel1",
+                       pattern = "panel1.hg38_multianno.clean",
+                       full.names = TRUE)
+
+# Batch read and convert ANNOVAR files into standard MAF objects
+maf_objects <- lapply(maf_list, function(x) {
+  annovarToMaf(annovar = x, Center = "MyCenter", refBuild = "hg38")
+})
+combined_maf <- merge_mafs(maf_objects)
+panel_data_dt <- as.data.table(combined_maf@data)
+
+# ==============================================================================
+# 2. VCF Info Field Quantitative Parsing via data.table
+# ==============================================================================
+setDT(panel_data_dt)
+
+# Vectorized function to split GT:AD:AF:DP strings from the Otherinfo14 column
+parse_info_row <- function(info_vec) {
+  res <- matrix(NA_real_, nrow = length(info_vec), ncol = 4, 
+                dimnames = list(NULL, c("VAF_Panel", "DP_Panel", "ref_counts", "alt_counts")))
+  valid_idx <- !is.na(info_vec) & info_vec != "." & info_vec != ""
+  if(!any(valid_idx)) return(as.data.table(res))
+  
+  splits <- strsplit(as.character(info_vec[valid_idx]), ":")
+  res[valid_idx, "VAF_Panel"] <- as.numeric(sapply(splits, function(x) x[3]))
+  res[valid_idx, "DP_Panel"]  <- as.numeric(sapply(splits, function(x) x[4]))
+  
+  ad_strings <- sapply(splits, function(x) x[2])
+  ad_splits  <- strsplit(ad_strings, ",")
+  res[valid_idx, "ref_counts"] <- as.numeric(sapply(ad_splits, function(x) x[1]))
+  res[valid_idx, "alt_counts"] <- as.numeric(sapply(ad_splits, function(x) x[2]))
+  
+  return(as.data.table(res))
+}
+
+# Bind parsed allelic counts back to the core data.table
+parsed_metrics <- parse_info_row(panel_data_dt$Otherinfo14)
+panel_data_dt_extended <- cbind(panel_data_dt, parsed_metrics)
+
+# Standardize and filter mutation records
+panel_ready <- as.data.frame(panel_data_dt_extended) %>% 
+  filter(!is.na(alt_counts)) %>%
+  mutate(
+    Sample = str_remove(Tumor_Sample_Barcode, "_panel1"),
+    Start  = as.numeric(Start_Position), 
+    End    = as.numeric(End_Position),
+    Variant_Classification = as.character(Variant_Classification)
+  ) %>%
+  dplyr::select(Sample, Hugo_Symbol, Chromosome, Start, End, Variant_Classification, VAF_Panel, DP_Panel, ref_counts, alt_counts)
+
+# ==============================================================================
+# 3. CNVkit Segment Ingestion and Copy Number Derivation
+# ==============================================================================
+# Ingest copy number segment data derived from the adjusted log2 ratio
+cns_all_parsed <- read_excel("article/File SI 8 cnv cytoband filtered.xlsx")
+
+cns_all_clean <- cns_all_parsed %>%
+  mutate(
+    cn_int = pmin(round(2 * (2 ^ as.numeric(log2_adj))), 6)
+  ) %>%
+  mutate(
+    major_cn = ifelse(cn_int > 1, cn_int - 1, cn_int),
+    minor_cn = ifelse(cn_int > 1, 1, 0)
+  )
+
+# ==============================================================================
+# 4. Coordinate Intersection (GenomicRanges) and Strict Quality Control
+# ==============================================================================
+mut_gr <- GRanges(
+  seqnames = panel_ready$Chromosome,
+  ranges = IRanges(start = panel_ready$Start, end = panel_ready$End)
+)
+
+cnv_gr <- GRanges(
+  seqnames = cns_all_clean$chromosome, 
+  ranges   = IRanges(start = cns_all_clean$start, end = cns_all_clean$end),
+  major_cn = cns_all_clean$major_cn,
+  minor_cn = cns_all_clean$minor_cn,
+  SampleID = cns_all_clean$SampleID
+)
+
+# Overlap mutations with copy number genomic tracks
+overlaps <- findOverlaps(mut_gr, cnv_gr)
+
+pyclone_vi_input <- panel_ready[queryHits(overlaps), ] %>%
+  mutate(
+    major_cn   = cnv_gr$major_cn[subjectHits(overlaps)],
+    minor_cn   = cnv_gr$minor_cn[subjectHits(overlaps)],
+    cnv_sample = cnv_gr$SampleID[subjectHits(overlaps)]
+  ) %>%
+  filter(Sample == cnv_sample) # Enforce patient-level ID matching across omics
+
+# Cast variables to strict integers to meet PyClone requirements
+pyclone_vi_input$ref_counts <- as.integer(pyclone_vi_input$ref_counts)
+pyclone_vi_input$alt_counts <- as.integer(pyclone_vi_input$alt_counts)
+pyclone_vi_input$minor_cn   <- as.integer(pyclone_vi_input$minor_cn)
+
+# Cap extreme copy numbers at 3 to prevent log-likelihood overflow in PyClone-VI
+pyclone_vi_input$major_cn <- ifelse(pyclone_vi_input$major_cn >= 4, as.integer(3), as.integer(pyclone_vi_input$major_cn))
+
+# Apply stringent depth criteria and eliminate missing values or homozygous deletions
+df_high <- subset(pyclone_vi_input, alt_counts >= 5 & (ref_counts + alt_counts) >= 100)
+df_clean <- na.omit(df_high)
+df_clean <- subset(df_clean, major_cn >= 1)
+
+# Remove uninformative samples displaying fewer than 2 mutations
+valid_samples <- names(which(table(df_clean$Sample) >= 2))
+df_clean <- subset(df_clean, Sample %in% valid_samples)
+
+# ==============================================================================
+# 5. Cohort Pooling and Mandatory 8-Column Format Serialization
+# ==============================================================================
+df_pool <- df_clean
+df_pool$sample_id <- "BALL_Cohort" # Aggregate all patients into a single pseudo-sample
+df_pool$mutation_id <- paste(df_pool$Sample, df_pool$Hugo_Symbol, df_pool$Chromosome, df_pool$Start, sep = "_")
+
+# Add germline baseline copy number columns to stabilize parsing
+df_pool$normal_cn     <- as.integer(2)
+df_pool$normal_status <- as.integer(2)
+
+verified_columns <- c("mutation_id", "sample_id", "ref_counts", "alt_counts", 
+                      "normal_cn", "normal_status", "major_cn", "minor_cn")
+
+df_pool_out <- df_pool[, verified_columns]
+
+# Write out the final sanitized table
+write.table(df_pool_out, "article/PyClone_VI_Main_Cohort_Input_pooled.tsv",
+            sep="\t", row.names=FALSE, quote=FALSE)
+
+cat("🎉 Pooled 8-column cohort input matrix successfully written out.\n")
