@@ -1,0 +1,18 @@
+library(tidyverse)
+setwd("/Users/DanYu_PhD_BVSc/Library/Mobile Documents/com~apple~CloudDocs/MyDocs/22_HKU/project_BALL/")
+# ==============================================================================
+# Re-import Normalized Text Matrix and De-multiplex Metadata
+# ==============================================================================
+pyclone_results <- read.table("article/Fig2_Upgraded_Clonal_Architecture_TXT.tsv", header = TRUE, sep = "\t")
+
+fig2_ready_df <- pyclone_results %>%
+  mutate(
+    # De-multiplex patient barcodes from the mutation_id string prefix
+    real_sample_id = sapply(strsplit(as.character(mutation_id), "_"), `[`, 1),
+    # Re-extract standard gene symbols for targeted recurrent driver downstream visualization
+    hugo_symbol    = sapply(strsplit(as.character(mutation_id), "_"), `[`, 2)
+  ) %>%
+  dplyr::select(mutation_id, sample_id = real_sample_id, hugo_symbol, cluster_id, cellular_fraction)
+
+# Preview final standardized multi-omics dataframe for Figure 2 generation
+print(head(fig2_ready_df))
