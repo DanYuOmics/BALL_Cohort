@@ -1,0 +1,179 @@
+#!/usr/bin/env Rscript
+# ==============================================================================
+# Script: 01_prepare_subclone_input.R
+# Description: Parse ANNOVAR somatic callsets, extract allelic counts 
+#              (ref/alt reads), overlap with CNVkit segment copy number states, 
+#              load clinical metadata, and serialize into PyClone-VI input format.
+# ==============================================================================
+
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(purrr)
+  library(tidyr)
+  library(stringr)
+  library(data.table)
+  library(maftools)
+  library(GenomicRanges)
+  library(readxl)
+  library(readr)
+})
+
+# ------------------------------------------------------------------------------
+# 1. Environment Setup & Clinical Metadata Ingestion
+# ------------------------------------------------------------------------------
+message("Step 1: Setting up paths and loading clinical metadata...")
+
+clinical_file <- Sys.getenv("CLINICAL_FILE", unset = "./article/B_ALL_105_Clinical_Data_Final.xlsx")
+annovar_dir   <- Sys.getenv("ANNOVAR_PANEL_DIR", unset = "/Volumes/Extreme SSD/somatic_annovar_output/panel1")
+cnv_file      <- Sys.getenv("CNV_FILE", unset = "./article/File SI 8 cnv cytoband filtered.xlsx")
+output_dir    <- Sys.getenv("OUTPUT_DIR", unset = "./article")
+
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+
+# Load clinical metadata
+if (!file.exists(clinical_file)) {
+  stop("⚠️ Error: Missing clinical metadata file at: ", clinical_file)
+}
+
+clinical_data <- read_xlsx(clinical_file) %>%
+  mutate(Event_Label = if_else(Event == 1, "Relapsed/Deceased", "Event-free"))
+
+valid_patient_ids <- clinical_data$Patient_ID
+message(sprintf("Loaded clinical metadata for %d patients.", length(valid_patient_ids)))
+
+# ------------------------------------------------------------------------------
+# 2. Mutation Matrix Ingestion via maftools
+# ------------------------------------------------------------------------------
+message("Step 2: Ingesting ANNOVAR somatic callsets via maftools...")
+
+maf_list <- list.files(annovar_dir, pattern = "panel1.hg38_multianno.clean", full.names = TRUE)
+
+if (length(maf_list) == 0) {
+  stop("⚠️ Error: No ANNOVAR clean callsets found in: ", annovar_dir)
+}
+
+maf_objects <- lapply(maf_list, function(x) {
+  annovarToMaf(annovar = x, Center = "MyCenter", refBuild = "hg38")
+})
+combined_maf  <- merge_mafs(maf_objects)
+panel_data_dt <- as.data.table(combined_maf@data)
+
+# ------------------------------------------------------------------------------
+# 3. VCF Info Field Quantitative Parsing via data.table
+# ------------------------------------------------------------------------------
+message("Step 3: Parsing VCF Info field for allelic depths (ref/alt counts)...")
+setDT(panel_data_dt)
+
+# Vectorized parsing function to split GT:AD:AF:DP strings
+parse_info_row <- function(info_vec) {
+  res <- matrix(NA_real_, nrow = length(info_vec), ncol = 4, 
+                dimnames = list(NULL, c("VAF_Panel", "DP_Panel", "ref_counts", "alt_counts")))
+  valid_idx <- !is.na(info_vec) & info_vec != "." & info_vec != ""
+  if (!any(valid_idx)) return(as.data.table(res))
+  
+  splits <- strsplit(as.character(info_vec[valid_idx]), ":")
+  res[valid_idx, "VAF_Panel"] <- as.numeric(sapply(splits, function(x) if (length(x) >= 3) x[3] else NA))
+  res[valid_idx, "DP_Panel"]  <- as.numeric(sapply(splits, function(x) if (length(x) >= 4) x[4] else NA))
+  
+  ad_strings <- sapply(splits, function(x) if (length(x) >= 2) x[2] else NA)
+  ad_splits  <- strsplit(ad_strings, ",")
+  res[valid_idx, "ref_counts"] <- as.numeric(sapply(ad_splits, function(x) if (length(x) >= 1) x[1] else NA))
+  res[valid_idx, "alt_counts"] <- as.numeric(sapply(ad_splits, function(x) if (length(x) >= 2) x[2] else NA))
+  
+  return(as.data.table(res))
+}
+
+parsed_metrics <- parse_info_row(panel_data_dt$Otherinfo14)
+panel_data_dt_extended <- cbind(panel_data_dt, parsed_metrics)
+
+panel_ready <- as.data.frame(panel_data_dt_extended) %>% 
+  filter(!is.na(alt_counts)) %>%
+  mutate(
+    Sample = str_remove(Tumor_Sample_Barcode, "_panel1"),
+    Start  = as.numeric(Start_Position), 
+    End    = as.numeric(End_Position),
+    Variant_Classification = as.character(Variant_Classification)
+  ) %>%
+  filter(Sample %in% valid_patient_ids) %>% # Ensure patient is present in clinical metadata
+  dplyr::select(Sample, Hugo_Symbol, Chromosome, Start, End, Variant_Classification, VAF_Panel, DP_Panel, ref_counts, alt_counts)
+
+# ------------------------------------------------------------------------------
+# 4. CNVkit Segment Ingestion & Copy Number Derivation
+# ------------------------------------------------------------------------------
+message("Step 4: Loading filtered CNV segments and calculating integer copy numbers...")
+
+if (!file.exists(cnv_file)) stop("⚠️ Missing CNV file at: ", cnv_file)
+
+cns_all_parsed <- read_excel(cnv_file)
+
+cns_all_clean <- cns_all_parsed %>%
+  mutate(
+    cn_int   = pmin(round(2 * (2 ^ as.numeric(log2_adj))), 6),
+    major_cn = ifelse(cn_int > 1, cn_int - 1, cn_int),
+    minor_cn = ifelse(cn_int > 1, 1, 0)
+  )
+
+# ------------------------------------------------------------------------------
+# 5. GenomicRanges Overlap & Quality Control Filters
+# ------------------------------------------------------------------------------
+message("Step 5: Overlapping mutations with CNV tracks using GenomicRanges...")
+
+mut_gr <- GRanges(
+  seqnames = panel_ready$Chromosome,
+  ranges   = IRanges(start = panel_ready$Start, end = panel_ready$End)
+)
+
+cnv_gr <- GRanges(
+  seqnames = cns_all_clean$chromosome, 
+  ranges   = IRanges(start = cns_all_clean$start, end = cns_all_clean$end),
+  major_cn = cns_all_clean$major_cn,
+  minor_cn = cns_all_clean$minor_cn,
+  SampleID = cns_all_clean$SampleID
+)
+
+overlaps <- findOverlaps(mut_gr, cnv_gr)
+
+pyclone_vi_input <- panel_ready[queryHits(overlaps), ] %>%
+  mutate(
+    major_cn   = cnv_gr$major_cn[subjectHits(overlaps)],
+    minor_cn   = cnv_gr$minor_cn[subjectHits(overlaps)],
+    cnv_sample = cnv_gr$SampleID[subjectHits(overlaps)]
+  ) %>%
+  filter(Sample == cnv_sample)
+
+# Formatting types & capping extreme copy numbers
+pyclone_vi_input$ref_counts <- as.integer(pyclone_vi_input$ref_counts)
+pyclone_vi_input$alt_counts <- as.integer(pyclone_vi_input$alt_counts)
+pyclone_vi_input$minor_cn   <- as.integer(pyclone_vi_input$minor_cn)
+pyclone_vi_input$major_cn   <- ifelse(pyclone_vi_input$major_cn >= 4, as.integer(3), as.integer(pyclone_vi_input$major_cn))
+
+# Apply stringent depth criteria & remove missing values
+df_high  <- subset(pyclone_vi_input, alt_counts >= 5 & (ref_counts + alt_counts) >= 100)
+df_clean <- na.omit(df_high)
+df_clean <- subset(df_clean, major_cn >= 1)
+
+# Remove samples with fewer than 2 mutations
+valid_samples <- names(which(table(df_clean$Sample) >= 2))
+df_clean      <- subset(df_clean, Sample %in% valid_samples)
+
+# ------------------------------------------------------------------------------
+# 6. Serialization to PyClone-VI Pooled Input Format
+# ------------------------------------------------------------------------------
+message("Step 6: Serializing into 8-column PyClone-VI cohort matrix...")
+
+df_pool               <- df_clean
+df_pool$sample_id     <- "BALL_Cohort"
+df_pool$mutation_id   <- paste(df_pool$Sample, df_pool$Hugo_Symbol, df_pool$Chromosome, df_pool$Start, sep = "_")
+df_pool$normal_cn     <- as.integer(2)
+df_pool$normal_status <- as.integer(2)
+
+verified_columns <- c("mutation_id", "sample_id", "ref_counts", "alt_counts", 
+                      "normal_cn", "normal_status", "major_cn", "minor_cn")
+
+df_pool_out <- df_pool[, verified_columns]
+
+output_tsv <- file.path(output_dir, "PyClone_VI_Main_Cohort_Input_pooled.tsv")
+write.table(df_pool_out, output_tsv, sep = "\t", row.names = FALSE, quote = FALSE)
+
+message(sprintf("🎉 Successfully exported PyClone-VI input matrix (%d mutations across %d patients) to: %s", 
+                nrow(df_pool_out), length(valid_samples), output_tsv))
