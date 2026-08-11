@@ -4,57 +4,64 @@ This repository contains the core computational pipelines, analytical scripts, a
 
 > **Genomic and Subclonal Complexity with B Cell Maturation Associated with Poor Outcome in Paediatric B ALL**
 
----
 
-## 📌 Overview
+[![R-version](https://img.shields.frame/badge/R->=4.2.0-blue.svg)](https://www.r-project.org/)
+[![Python-version](https://img.shields.io/badge/Python->=3.9-green.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This study integrates ultra-deep targeted panel sequencing (~1,500×), whole-exome sequencing (WES), single-cell RNA sequencing (scRNA-seq), and single-cell V(D)J profiling across 105 paediatric B-ALL patients to dissect genomic instability, subclonal evolutionary topologies, and chemoresistant cell reservoirs.
-
-This repository provides:
-1. **Upstream Processing Frameworks**: Scripts for somatic variant calling, copy number variation (CNV) profiling, and single-cell RNA/VDJ data integration.
-2. **Main Figure Analytical Code**: Scripts to reproduce main figures (Figures 2–7), including subclonal deconvolution, pseudotime trajectory mapping, module scoring, and prognostic model evaluation.
+This repository contains the complete, reproducible computational pipelines and analytical scripts for our multi-omics B-ALL study. The analysis spans upstream somatic/single-cell raw data processing, population-level genomic landscape characterization, PyClone-VI subclonal evolutionary deconvolution, single-cell dynamics mapping, microenvironmental immune surveillance profiling, and independent validation of an evolution-enhanced prognostic model.
 
 ---
 
-## 🛠 Repository Structure
+## 📂 Repository Structure
 
-### `scripts/00_upstream_processing/`
-- `01_panel_WES_variant_calling.sh`: Somatic variant calling using BWA-MEM, Picard, and GATK Mutect2 in paired and tumour-only modes.
-- `02_cnvkit_pipeline.sh`: Copy number segmentation and reference normalization using CNVkit.
-- `03_scRNA_seurat_harmony.R`: Quality control, RPCA integration, Harmony batch correction, and UMAP dimensionality reduction using Seurat.
+The code is organized sequentially into modular directories reflecting the computational and analytical workflows:
 
-### `scripts/01_genomic_landscape_fig2/`
-- `fig2a_oncoplot_landscape.R`: Visualization of recurrent mutational landscapes using `maftools`.
-- `fig2c_outcome_associated_variants.R`: Multi-variable Cox regression and alteration enrichment comparisons between outcome groups.
-- `fig2e_chromosomal_aneuploidy.R`: Quantifying chromosomal copy number alterations and aneuploidy levels.
-
-### `scripts/02_subclonal_evolution_fig3/`
-- `fig3a_pyclone_vi_clustering.py`: Bayesian variational inference for subclonal deconvolution using PyClone-VI.
-- `fig3bc_evolutionary_topology.R`: Analysis of truncal vs. branching mutation preferences and testing the threshold effect ($\ge$4 high-risk alterations).
-- `fig3_shannon_diversity.R`: Intra-tumour subclonal diversity calculation via CCF-weighted Shannon index ($H'$).
-
-### `scripts/03_single_cell_dynamics_fig4_fig5/`
-- `fig4c_hsc_like_proportions.R`: Quantifying HSC-like blast proportions and transcriptional diversity (gene richness per cell).
-- `fig4e_monocle3_pseudotime.R`: Single-cell developmental pseudotime trajectory inference using `Monocle3`.
-- `fig4g_drug_resistance_score.R`: Stage-specific drug resistance module scoring using `AddModuleScore`.
-- `fig5a_mature_B_subclustering.R`: Fine-grained subclustering of mature B-cell reservoirs (*BANK1*, *BCL2*, *CD44*).
-
-### `scripts/04_microenvironment_fig6/`
-- `fig6cd_cytotoxicity_scoring.R`: Cytotoxic effector scoring for host T and NK lymphocytes.
-- `fig6e_cellchat_interactions.R`: Cell-cell communication and immune checkpoint interaction profiling using `CellChat`.
-- `fig6gh_vdj_repertoire.R`: Immune repertoire diversity and top clonotype frequency analysis using `MiXCR` outputs.
-
-### `scripts/05_prognostic_classifier_fig7/`
-- `fig7c_multivariable_cox_model.R`: Construction of the evolution-enhanced prognostic classifier combining NCI risk, MRD, molecular subtypes, and subclonal mutation count.
-- `fig7e_time_dependent_roc.R`: Time-dependent ROC (24-month AUC) analysis and independent validation on the TARGET B-ALL Phase 2 cohort.
-
----
-
-## 💻 System Requirements & Environment
-
-The scripts were developed and tested on Linux (Ubuntu 22.04 / CentOS 7) and R (v4.3.3) / Python (v3.12.2).
-
-### Key Dependencies:
-- **R packages**: `Seurat` (v5.0), `Monocle3` (v1.3.1), `CellChat`, `maftools`, `timeROC`, `survival`, `survminer`, `ComplexHeatmap`, `tidyverse`.
-- **Python libraries**: `PyClone-VI`, `numpy`, `pandas`, `h5py`, `scikit-learn`.
-- **Command-line tools**: `GATK` (v4.x), `BWA`, `CNVkit`, `MiXCR` (v3.0.13).
+```text
+.
+├── scripts/
+│   ├── 00_upstream_processing/
+│   │   ├── 01_bwa_alignment.sh
+│   │   ├── 02_bam_qc.sh
+│   │   ├── 03_gatk_markduplicates.sh
+│   │   ├── 04_mutect2_calling.sh
+│   │   ├── 05_filter_mutect_calls.sh
+│   │   ├── 06_annovar_annotation.sh
+│   │   ├── 07_scrna_seurat_rpca_harmony.R
+│   │   ├── 08_scrna_singler_annotation.R
+│   │   └── 09_vdj_mixcr_pipeline.sh
+│   │
+│   ├── 01_genomic_landscape_fig2/
+│   │   ├── 01_oncoplot_landscape.R
+│   │   ├── 02_cnv_cytoband_landscape.R
+│   │   ├── 03_comparative_mutational_map.R
+│   │   ├── 04_cox_high_risk_alterations.R
+│   │   └── 05_chromosomal_aneuploidy.R
+│   │
+│   ├── 02_subclonal_evolution_fig3/
+│   │   ├── 01_prepare_subclone_input.R
+│   │   ├── 02_pyclone_deconvolution.py
+│   │   ├── 03_subclone_evolution_figures.R
+│   │   └── 04_subclone_diversity_survival.R
+│   │
+│   ├── 03_single_cell_dynamics_fig4_fig5/
+│   │   ├── 01_reannotate_B_subclusters.R
+│   │   ├── 02_cell_proportion_comparison.R
+│   │   ├── 03_hsc_richness_pseudotime.R
+│   │   └── 04_gene_pseudotime_dynamics.R
+│   │
+│   ├── 04_microenvironment/
+│   │   ├── 01_cytotoxicity_and_nk_receptors.R
+│   │   ├── 02_immune_efficacy_and_lr_pairs.R
+│   │   ├── 03_pseudotime_ridges_and_density.R
+│   │   └── 04_virtual_drug_screening_lgals9.R
+│   │
+│   └── 05_prognostic_model/
+│       ├── 01_univariate_cox_forest.R
+│       ├── 02_genomic_score_subclone_correlation.R
+│       ├── 03_discovery_cohort_survival.R
+│       ├── 04_prepare_target_validation_data.R
+│       └── 05_validation_cohort_and_time_roc.R
+│
+├── README.md
+└── LICENSE
