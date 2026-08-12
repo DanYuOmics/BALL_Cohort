@@ -9,7 +9,6 @@ This repository contains the core computational pipelines, analytical scripts, a
 [![Python-version](https://img.shields.io/badge/Python-%3E%3D_3.9-green.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This repository contains the complete, reproducible computational pipelines and analytical scripts for our multi-omics B-ALL study. The analysis spans upstream somatic/single-cell raw data processing, population-level genomic landscape characterization, PyClone-VI subclonal evolutionary deconvolution, single-cell dynamics mapping, microenvironmental immune surveillance profiling, and independent validation of an evolution-enhanced prognostic model.
 
 ---
 
