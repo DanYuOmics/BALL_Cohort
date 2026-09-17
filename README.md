@@ -63,7 +63,7 @@ To facilitate independent review and rapid code reproduction without downloading
 
 ## Demo Files Provided:
 * data/demo/demo_clinical_survival.tsv: Downsampled clinical features and risk scores (n = 30).
-* data/demo/demo_maf_subset.maf: Minimal somatic mutation table for testing oncoplot rendering.
+* data/demo/demo_mutations.tsv: Minimal somatic mutation table for testing oncoplot rendering.
 * data/demo/demo_sc_subset.rds: Downsampled Seurat object containing pre-annotated B-cell subpopulations.
 
 ## Running the Demo:
