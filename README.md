@@ -84,56 +84,49 @@ Rscript scripts/05_prognostic_model/03_discovery_cohort_survival.R \
 
 # 4. Repository Structure
 
-.
-├── data/
-│   └── demo/                               # Lightweight demo datasets for evaluation
-├── scripts/
-│   ├── 00_upstream_processing/             # Pipeline scripts for raw sequencing data
-│   │   ├── 01_bwa_alignment.sh
-│   │   ├── 02_bam_qc.sh
-│   │   ├── 03_gatk_markduplicates.sh
-│   │   ├── 04_mutect2_calling.sh
-│   │   ├── 05_filter_mutect_calls.sh
-│   │   ├── 06_annovar_annotation.sh
-│   │   ├── 07_scrna_seurat_rpca_harmony.R
-│   │   ├── 08_scrna_singler_annotation.R
-│   │   └── 09_vdj_mixcr_pipeline.sh
-│   │
-│   ├── 01_genomic_landscape_fig2/          # WES / targeted panel mutation analyses
-│   │   ├── 01_oncoplot_landscape.R
-│   │   ├── 02_cnv_cytoband_landscape.R
-│   │   ├── 03_comparative_mutational_map.R
-│   │   ├── 04_cox_high_risk_alterations.R
-│   │   └── 05_chromosomal_aneuploidy.R
-│   │
-│   ├── 02_subclonal_evolution_fig3/        # Subclonal architecture and PyClone workflows
-│   │   ├── 01_prepare_subclone_input.R
-│   │   ├── 02_pyclone_deconvolution.py
-│   │   ├── 03_subclone_evolution_figures.R
-│   │   └── 04_subclone_diversity_survival.R
-│   │
-│   ├── 03_single_cell_dynamics_fig4_fig5/  # scRNA-seq clustering and differentiation trajectories
-│   │   ├── 01_reannotate_B_subclusters.R
-│   │   ├── 02_cell_proportion_comparison.R
-│   │   ├── 03_hsc_richness_pseudotime.R
-│   │   └── 04_gene_pseudotime_dynamics.R
-│   │
-│   ├── 04_microenvironment/                # Immune microenvironment, NK/T cell receptor analysis
-│   │   ├── 01_cytotoxicity_and_nk_receptors.R
-│   │   ├── 02_immune_efficacy_and_lr_pairs.R
-│   │   ├── 03_pseudotime_ridges_and_density.R
-│   │   └── 04_virtual_drug_screening_lgals9.R
-│   │
-│   └── 05_prognostic_model/                # Multi-omics prognostic score and TARGET validation
-│       ├── 01_univariate_cox_forest.R
-│       ├── 02_genomic_score_subclone_correlation.R
-│       ├── 03_discovery_cohort_survival.R
-│       ├── 04_prepare_target_validation_data.R
-│       └── 05_validation_cohort_and_time_roc.R
-│
-├── results/                                # Output directory for generated plots and tables
-├── LICENSE
-└── README.md
+* **data/**
+  * **demo/** — *Lightweight demo datasets for evaluation*
+* **scripts/**
+  * **00_upstream_processing/** — *Pipeline scripts for raw sequencing data*
+    * `01_bwa_alignment.sh`
+    * `02_bam_qc.sh`
+    * `03_gatk_markduplicates.sh`
+    * `04_mutect2_calling.sh`
+    * `05_filter_mutect_calls.sh`
+    * `06_annovar_annotation.sh`
+    * `07_scrna_seurat_rpca_harmony.R`
+    * `08_scrna_singler_annotation.R`
+    * `09_vdj_mixcr_pipeline.sh`
+  * **01_genomic_landscape_fig2/** — *WES / targeted panel mutation analyses*
+    * `01_oncoplot_landscape.R`
+    * `02_cnv_cytoband_landscape.R`
+    * `03_comparative_mutational_map.R`
+    * `04_cox_high_risk_alterations.R`
+    * `05_chromosomal_aneuploidy.R`
+  * **02_subclonal_evolution_fig3/** — *Subclonal architecture and PyClone workflows*
+    * `01_prepare_subclone_input.R`
+    * `02_pyclone_deconvolution.py`
+    * `03_subclone_evolution_figures.R`
+    * `04_subclone_diversity_survival.R`
+  * **03_single_cell_dynamics_fig4_fig5/** — *scRNA-seq clustering and differentiation trajectories*
+    * `01_reannotate_B_subclusters.R`
+    * `02_cell_proportion_comparison.R`
+    * `03_hsc_richness_pseudotime.R`
+    * `04_gene_pseudotime_dynamics.R`
+  * **04_microenvironment/** — *Immune microenvironment, NK/T cell receptor analysis*
+    * `01_cytotoxicity_and_nk_receptors.R`
+    * `02_immune_efficacy_and_lr_pairs.R`
+    * `03_pseudotime_ridges_and_density.R`
+    * `04_virtual_drug_screening_lgals9.R`
+  * **05_prognostic_model/** — *Multi-omics prognostic score and TARGET validation*
+    * `01_univariate_cox_forest.R`
+    * `02_genomic_score_subclone_correlation.R`
+    * `03_discovery_cohort_survival.R`
+    * `04_prepare_target_validation_data.R`
+    * `05_validation_cohort_and_time_roc.R`
+* **results/** — *Output directory for generated plots and tables*
+* `LICENSE`
+* `README.md`
 
 ---
 
