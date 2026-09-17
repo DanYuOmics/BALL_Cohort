@@ -64,20 +64,16 @@ To facilitate independent review and rapid code reproduction without downloading
 ## Demo Files Provided:
 * data/demo/demo_clinical_survival.tsv: Downsampled clinical features and risk scores (n = 30).
 * data/demo/demo_mutations.tsv: Minimal somatic mutation table for testing oncoplot rendering.
-* data/demo/demo_sc_subset.rds: Downsampled Seurat object containing pre-annotated B-cell subpopulations.
 
 ## Running the Demo:
 Execute the prognostic model validation and Kaplan-Meier curve generation on the demo cohort:
 
-Rscript scripts/05_prognostic_model/03_discovery_cohort_survival.R \
+Rscript scripts/05_prognostic_model/01_univariate_cox_forest.R \
   --input data/demo/demo_clinical_survival.tsv \
   --output_dir results/demo_output
 
 ## Expected Output & Verification:
-* Output files:
-  * results/demo_output/KM_survival_curve.pdf
-  * results/demo_output/TimeROC_24month.pdf
-* Expected Result: Time-dependent ROC curve showing dynamic AUC metrics and Kaplan-Meier stratified survival curves separating risk categories with log-rank statistical outputs.
+* Expected Result: Forest plots on a logarithmic scale with HR (95% CI) and P-value annotations.
 * Expected Runtime: < 2 minutes on an ordinary desktop computer (e.g., Apple M-series or Intel Core i7, 16 GB RAM).
 
 ---
