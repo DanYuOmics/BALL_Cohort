@@ -1,0 +1,31 @@
+Patient_ID	Age_Months	Sex	Ethnicity_Group	WBC	Immunophenotype	CNS_Status	NCI_Risk_Group	Regimen	Blina_Used	HSCT	BM_Status_D46	MRD_Flow	MRD_VDJ	Relapse_Status	Vital_Status	Event	EFS_Month	OS_Month	Subtype
+Demo_Pt_01	81	Male	Han Chinese	13.3	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	38.5	38.5	ETV6-RUNX1
+Demo_Pt_02	39	Female	Han Chinese	20.89	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	35.9	35.9	IGK-MIR4436A
+Demo_Pt_03	30	Male	Han Chinese	15.39	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2015	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Relapsed	Deceased	1	29.7	NA	Not_Determined
+Demo_Pt_04	36	Male	Han Chinese	2.4	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2015	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Relapsed	Alive	1	46.8	47.6	Not_Determined
+Demo_Pt_05	26	Female	Han Chinese	23.18	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2015	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Relapsed	Alive	1	48.8	51.6	Not_Determined
+Demo_Pt_06	107	Male	Han Chinese	4.9	Common B-ALL	CNS1	High Risk/Escalated	CCCG-ALL-2020	Yes	No	M1 (<5% blasts)	Positive (≥0.01%)	Positive (≥0.01%)	Non-relapsed	Alive	0	22.6	22.6	Not_Determined
+Demo_Pt_07	108	Male	Han Chinese	2.7	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	24.2	24.2	Not_Determined
+Demo_Pt_08	8	Male	Han Chinese	122.41	Common B-ALL	CNS1	Intermediate Risk (IR)	CCCG-ALL-2020	Yes	Yes	M1 (<5% blasts)	Unknown	Positive (≥0.01%)	Relapsed	Alive	1	2.1	17.3	KMT2A-rearranged
+Demo_Pt_09	74	Male	Han Chinese	91.52	Common B-ALL	CNS1	Intermediate Risk (IR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	31.8	31.8	ZNF384-rearranged
+Demo_Pt_10	110	Male	Han Chinese	2.43	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	23.2	23.2	Not_Determined
+Demo_Pt_11	64	Female	Han Chinese	143.62	Common B-ALL	CNS1	Intermediate Risk (IR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	31.6	31.6	Not_Determined
+Demo_Pt_12	23	Male	Minority Groups	49.66	Pre-B-ALL	CNS1	Intermediate Risk (IR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Relapsed	Deceased	1	8.8	9	TCF3-PBX1
+Demo_Pt_13	86	Female	Han Chinese	35.52	Pre-B-ALL	CNS1	Intermediate Risk (IR)	National Protocol	Yes	Yes	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	12.1	12.1	Not_Determined
+Demo_Pt_14	75	Male	Han Chinese	29.66	Common B-ALL	CNS1	Intermediate Risk (IR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	29.3	29.3	TCF3-PBX1
+Demo_Pt_15	51	Male	Han Chinese	2.39	Common B-ALL	CNS1	High Risk/Escalated	National Protocol	Yes	No	M2/M3 (≥5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	16.4	16.4	ETV6-RUNX1
+Demo_Pt_16	45	Male	Han Chinese	2.66	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Positive (≥0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	27.3	27.3	Not_Determined
+Demo_Pt_17	63	Male	Han Chinese	4.78	Common B-ALL	CNS1	High Risk/Escalated	CCCG-ALL-2020	Yes	No	M2/M3 (≥5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	10.3	10.3	Not_Determined
+Demo_Pt_18	52	Male	Han Chinese	4.95	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	12.1	12.1	ETV6-RUNX1
+Demo_Pt_19	3	Female	Han Chinese	159.99	Pre-B-ALL	CNS2/3	Intermediate Risk (IR)	Infant-ALL	Yes	Yes	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	11.8	11.8	KMT2A-rearranged
+Demo_Pt_20	97	Female	Han Chinese	32.6	Common B-ALL	CNS1	Intermediate Risk (IR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Relapsed	Deceased	1	17	25.9	DUX4-rearranged
+Demo_Pt_21	40	Female	Han Chinese	2.77	Common B-ALL	CNS1	High Risk/Escalated	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	24.1	24.1	ETV6-RUNX1
+Demo_Pt_22	2	Female	Han Chinese	90.66	Pre-B-ALL	CNS1	Intermediate Risk (IR)	Infant-ALL	Yes	Yes	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Deceased	1	17.9	17.9	NUTM1-rearranged
+Demo_Pt_23	131	Male	Han Chinese	11.66	Common B-ALL	CNS1	Intermediate Risk (IR)	National Protocol	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	26.7	26.7	TCF3-PBX1
+Demo_Pt_24	62	Male	Han Chinese	8.98	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2015	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Relapsed	Alive	1	58.8	91.7	Not_Determined
+Demo_Pt_25	38	Male	Han Chinese	2.09	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2020	No	Yes	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	28	28	CDKN2A/B loss
+Demo_Pt_26	132	Male	Han Chinese	192.74	Common B-ALL	CNS1	Intermediate Risk (IR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	24.9	24.9	DUX4-rearranged
+Demo_Pt_27	37	Female	Han Chinese	50.56	Common B-ALL	CNS1	Intermediate Risk (IR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	25.4	25.4	Not_Determined
+Demo_Pt_28	56	Male	Han Chinese	30.84	Common B-ALL	CNS1	Low Risk (LR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	26.6	26.6	chr8-rearranged
+Demo_Pt_29	44	Male	Minority Groups	2.66	Common B-ALL	CNS1	High Risk/Escalated	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Relapsed	Deceased	1	28.4	30.9	Not_Determined
+Demo_Pt_30	51	Male	Han Chinese	6.41	Pre-B-ALL	CNS1	Intermediate Risk (IR)	CCCG-ALL-2020	No	No	M1 (<5% blasts)	Negative (<0.01%)	Negative (<0.01%)	Non-relapsed	Alive	0	6.8	6.8	TCF3-PBX1
